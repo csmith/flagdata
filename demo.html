@@ -1,0 +1,112 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <title>Flag Finder</title>
+    <style type="text/css">
+        body {
+            margin: 10em auto;
+            max-width: 75%;
+            font-family: sans-serif;
+        }
+
+        input {
+            width: 100%;
+            font-size: xx-large;
+            padding: 0.5em;
+        }
+
+        img {
+            max-width: 240px;
+            max-height: 120px;
+        }
+
+        #results div {
+            display: inline-block;
+            width: 300px;
+            height: 150px;
+            text-align: center;
+            margin: 3em 1em;
+        }
+
+        .demo {
+            cursor: pointer;
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+<input type="text" id="terms" placeholder="Search terms" autofocus>
+<p>Try:
+    <span class="demo">stars and stripes</span>,
+    <span class="demo">green with yellow diamond</span>,
+    <span class="demo">maple leaf</span>,
+    <span class="demo">red white black eagle</span>,
+    <span class="demo">george cross</span>,
+    <span class="demo">crescent moon</span>
+</p>
+<div id="results">
+
+</div>
+<script>
+  let flags = []
+  let allWords = []
+
+  document.addEventListener('DOMContentLoaded', function () {
+    fetch('flags.json')
+      .then(response => response.json())
+      .then(json => {
+        flags = json
+        allWords = flags.reduce(function (previous, current) {
+          return previous.concat(current.keywords.filter(k => !previous.includes(k)))
+        }, [])
+        update()
+      })
+
+    const terms = document.getElementById('terms')
+    const output = document.getElementById('results')
+    let lastQuery = []
+
+    function update () {
+      const query = terms.value
+        .replaceAll('-', ' ')
+        .split(' ')
+        .map(w => w.toLowerCase().replaceAll(/[^a-z0-9]/g, ''))
+        .filter(w => w.length > 0)
+        .filter(w => allWords.includes(w))
+
+      if (query === lastQuery) {
+        return
+      }
+      lastQuery = query
+
+      while (output.firstChild) {
+        output.removeChild(output.lastChild)
+      }
+
+      if (query.length === 0) {
+        return
+      }
+
+      flags.filter(f => query.every(t => f.keywords.includes(t))).forEach(function (flag) {
+        const container = document.createElement('div')
+        container
+          .appendChild(document.createElement('h2'))
+          .appendChild(document.createTextNode(flag.country))
+        container
+          .appendChild(document.createElement('img'))
+          .setAttribute('src', flag.image)
+        output.appendChild(container)
+      })
+    }
+
+    terms.addEventListener('input', update)
+    document.querySelectorAll('.demo').forEach(function (demo) {
+      demo.addEventListener('click', function () {
+        terms.value = demo.textContent
+        update()
+      })
+    })
+  })
+</script>
+</body>
+</html>

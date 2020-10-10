@@ -1,0 +1,15 @@
+= Flag data
+
+This repository contains information about flags, gleaned from the
+https://www.cia.gov/library/publications/resources/the-world-factbook/[CIA World Factbook].
+
+Flag names, image paths, descriptions and keywords are available in link:flags.json[flags.json],
+images themselves in the link:images[images] folder.
+
+An example HTML/JavaScript for querying flags is given in link:demo.html[demo.html], and a Golang
+application to update the data files and download flags is in link:cmd/update[cmd/update].
+
+== Licence
+
+Flag data and images are from the CIA World Factbook, which is released into the public domain.
+Original code is released under the MIT licence - see the link:LICENCE[LICENCE] file.
