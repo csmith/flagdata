@@ -20,7 +20,7 @@ import (
 
 var (
 	outPath   = flag.String("out", "flags.json", "Path to save JSON data to")
-	flagsPath = flag.String("flags", "images", "Path to save flag images to")
+	flagsPath = flag.String("flags", "images/original", "Path to save flag images to")
 )
 
 type Flag struct {
@@ -48,7 +48,7 @@ func main() {
 		flags = append(flags, &Flag{
 			Country:     name,
 			Description: desc,
-			Image:       filepath.Join(*flagsPath, path.Base(src)),
+			Image:       strings.TrimSuffix(path.Base(src), ".jpg"),
 			Keywords:    words(fmt.Sprintf("%s %s", name, desc)),
 		})
 	})
@@ -104,9 +104,9 @@ func words(text string) []string {
 }
 
 func downloadFlag(relativePath string) error {
-	target := filepath.Join(*flagsPath, path.Base(relativePath))
-	if _, err := os.Stat(target); err == nil {
-		// File already exists, don't bother redownloading
+	flagPath := filepath.Join(*flagsPath, path.Base(relativePath))
+	if _, err := os.Stat(flagPath); err == nil {
+		// File already exists, don't bother downloading again
 		return nil
 	}
 
